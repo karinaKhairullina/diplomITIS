@@ -1,0 +1,101 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+.normal {
+    color: green;
+}
+
+.anomaly {
+    color: red;
+}
+
+.no-data {
+    color: orange;
+}
+
+.info {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+.reset-button {
+    margin-top: 10px;
+}
+
+/* Стили для модального окна */
+#modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+}
+
+#modal .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+#modal .close:hover {
+    color: #000;
+}
+
+/* index.css */
+
+/* Стили для модального окна */
+#modal {
+    display: none; /* Скрываем окно по умолчанию */
+    position: fixed; /* Фиксированное положение */
+    top: 50%; /* Центрируем по вертикали */
+    left: 50%; /* Центрируем по горизонтали */
+    transform: translate(-50%, -50%); /* Корректируем центрирование */
+    background: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Убедитесь, что окно поверх других элементов */
+    max-width: 400px; /* Ограничение ширины */
+    width: 100%; /* Занимает всю доступную ширину */
+}
+
+#modal .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+#modal .close:hover {
+    color: #000;
+}

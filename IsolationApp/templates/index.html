@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ аномалий</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+
+</head>
+<body>
+    <h1>Анализ аномалий</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="file">Загрузите файл:</label>
+        <input type="file" name="file" id="file" accept=".csv,.json">
+        <button type="submit">Анализировать</button>
+        <button type="button" class="reset-button" onclick="resetPage()">Сбросить</button>
+    </form>
+
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if results %}
+    <h2>Результаты анализа</h2>
+    {% for row in results %}
+    <table>
+        <thead>
+            <tr>
+                <th>Признак</th>
+                <th>Значение</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in row.values %}
+            <tr>
+                <td>{{ item.feature }}</td>
+                <td class="{% if item.status == 'Нормальная точка' %}normal{% elif item.status == 'Аномалия' %}anomaly{% else %}no-data{% endif %}">
+                    {{ item.value }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+    {% elif request.method == 'POST' %}
+    <p>Аномалий не обнаружено.</p>
+    {% endif %}
+
+    {% if unprocessed_features_message %}
+    <p>{{ unprocessed_features_message }}</p>
+    {% endif %}
+
+    <div class="info">
+        <strong>Пояснения по цветам:</strong>
+        <ul>
+            <li><span style="color: green;">Зеленый</span> - нормальное значение</li>
+            <li><span style="color: red;">Красный</span> - аномальная точка</li>
+            <li><span style="color: orange;">Оранжевый</span> - нет данных</li>
+        </ul>
+    </div>
+
+<!-- templates/index.html -->
+
+    <button onclick="openModal()">Информация о проекте</button>
+
+    <!-- Модальное окно -->
+    <div id="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>О проекте</h3>
+        <p>Это проект для анализа аномалий в данных. Доступные признаки для анализа:</p>
+        <ul>
+            <li>Battleground</li>
+            <li>Code</li>
+            <li>Faction</li>
+            <li>Class</li>
+            <li>KB</li>
+            <li>D</li>
+            <li>HK</li>
+            <li>DD</li>
+            <li>HD</li>
+            <li>Honor</li>
+            <li>Win</li>
+            <li>Lose</li>
+            <li>Rol</li>
+            <li>BE</li>
+        </ul>
+    </div>
+
+    <script>
+        function resetPage() {
+            window.location.reload();
+        }
+
+        function openModal() {
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
