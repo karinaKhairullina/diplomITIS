@@ -1,5 +1,3 @@
-# config.py
-
 import os
 import pandas as pd
 

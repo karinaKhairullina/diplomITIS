@@ -1,19 +1,14 @@
-# views.py
-
 from django.shortcuts import render
 import pandas as pd
 from anomaly_detection.predict import CombinedModel
-from anomaly_detection.config import MODELS_DIR
 
 def index(request):
     results = []
-    unprocessed_features_message = ""
     error = ""
+    missing_features_set = set()
 
     if request.method == 'POST' and request.FILES.get('file'):
         uploaded_file = request.FILES['file']
-
-        # Определяем формат файла
         file_extension = uploaded_file.name.split('.')[-1].lower()
 
         try:
@@ -28,38 +23,36 @@ def index(request):
             error = f'Ошибка при чтении файла: {str(e)}'
             return render(request, 'index.html', {'error': error})
 
-        # Получаем список признаков из загруженного файла
-        feature_names_list = df.columns.tolist()  # Это плоский список
+        feature_names_list = df.columns.tolist()
+        combined_model = CombinedModel(feature_names_list)
+        predictions = combined_model.predict(df)
 
-        # Создаем экземпляр модели
-        combined_model = CombinedModel(MODELS_DIR, feature_names_list)
-
-        # Анализируем данные
-        for _, row in df.iterrows():
-            new_data_row = pd.DataFrame([row])
-            final_prediction, feature_results = combined_model.predict(new_data_row)
-
-            # Формируем результат для вывода
+        for idx, (final_prediction, row_results) in enumerate(predictions):
             formatted_row = {
-                'values': [],
+                'values': []
             }
+            missing_features = []
 
-            for feature in feature_names_list:
-                value = row.get(feature, "Нет данных")
-                status = feature_results.get(feature, "Недоступно")
-                formatted_row['values'].append({
-                    'feature': feature,
-                    'value': value,
-                    'status': status
-                })
+            for feature, status in zip(feature_names_list, row_results):
+                value = df.iloc[idx].get(feature, "Недоступно (нет модели)")
 
-            # Сохраняем только строки с аномалиями
+                if status == "Недоступно (нет модели)":
+                    missing_features.append(feature)
+                    continue
+                else:
+                    formatted_row['values'].append({
+                        'feature': feature,
+                        'value': value,
+                        'status': status
+                    })
+
             if final_prediction == "Аномалия":
                 results.append(formatted_row)
 
+            missing_features_set.update(missing_features)
 
     return render(request, 'index.html', {
         'results': results,
-        'unprocessed_features_message': unprocessed_features_message,
+        'missing_features_list': sorted(missing_features_set),
         'error': error
     })
