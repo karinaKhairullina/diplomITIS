@@ -28,11 +28,9 @@ def index(request):
         # Оригинальные названия признаков
         original_feature_names_list = [feature.strip() for feature in df.columns.tolist()]
 
-        print("Переданные признаки из файла:")
-        print(original_feature_names_list)
-
         # Инициализация CombinedModel с добавлением FEATURE_INDEX_MAPPING и ALTERNATIVE_NAMES
         combined_model = CombinedModel(original_feature_names_list, FEATURE_INDEX_MAPPING, ALTERNATIVE_NAMES)
+        df = combined_model.clean_data(df)
         predictions = combined_model.predict(df)
 
         # Обработка результатов предсказаний

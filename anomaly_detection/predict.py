@@ -1,3 +1,4 @@
+import pandas as pd
 from anomaly_detection.config import FEATURE_INDEX_MAPPING, ALTERNATIVE_NAMES
 from anomaly_detection.cache import model_cache
 
@@ -19,29 +20,16 @@ class CombinedModel:
         self.models = model_cache.models
         self.scalers = model_cache.scalers
 
-        print("Ожидаемые признаки на основе обучающей модели:")
-        print(self.original_feature_names_list)
-        print("Нормализованные признаки на основе обучающей модели:")
-        print(self.normalized_feature_names_list)
-
         for normalized_feature in self.normalized_feature_names_list:
             i = feature_index_mapping.get(normalized_feature)
             if i is None or (i, normalized_feature) not in self.models:
                 self.unprocessed_features.append(normalized_feature)
-                print(f"Модель для признака {normalized_feature} отсутствует в кэше")
 
     def predict(self, data):
         results = []
 
-        # Печать всех переданных признаков
-        print("Признаки, передаваемые для предсказания:")
-        print(data.columns.tolist())
-
         # Преобразуем переданные данные, чтобы нормализованные признаки совпали с теми, что использовались при обучении
-        data_renamed = data.rename(columns=ALTERNATIVE_NAMES)
-
-        print("Данные после переименования признаков в нормализованные:")
-        print(data_renamed.columns.tolist())
+        data_renamed = self.aggregate_columns(data)
 
         for original_feature, normalized_feature in zip(
                 self.original_feature_names_list, self.normalized_feature_names_list
@@ -60,7 +48,6 @@ class CombinedModel:
                 scaled_data = scaler.transform(data_renamed[[normalized_feature]].astype(float))
             except KeyError:
                 results.append(["Недоступно (нет данных)"] * len(data))
-                print(f"Признак {original_feature} отсутствует в данных.")
                 continue
 
             # Делаем предсказания для всех строк
@@ -82,3 +69,34 @@ class CombinedModel:
             final_results.append((final_prediction, row_results))
 
         return final_results
+
+    def aggregate_columns(self, data):
+        """Агрегируем все колонки с одинаковыми нормализованными названиями (например, Elim, KB => Kills)."""
+        # Шаг 1: Переименуем колонки
+        data_renamed = data.rename(columns=ALTERNATIVE_NAMES)
+
+        # Шаг 2: Собираем, какие колонки теперь имеют одинаковое имя
+        new_columns = data_renamed.columns
+        aggregated = pd.DataFrame()
+
+        for col in set(new_columns):
+            cols_with_same_name = [c for c in new_columns if c == col]
+
+            if len(cols_with_same_name) == 1:
+                # Только одна колонка — оставляем как есть
+                aggregated[col] = data_renamed[col]
+            else:
+                # Несколько колонок — агрегируем (например, берём среднее по строке)
+                aggregated[col] = data_renamed[cols_with_same_name].mean(axis=1, skipna=True)
+
+        return aggregated
+
+    def clean_data(self, data):
+        """Функция для обработки данных: замена запятых на точки, преобразование строк в числа, обработка NaN."""
+        # Заменяем запятые на точки в строковых данных
+        data = data.applymap(lambda x: str(x).replace(',', '.') if isinstance(x, str) else x)
+
+        # Преобразуем строки в числовой формат, ошибки преобразования заменяются на NaN
+        data = data.apply(pd.to_numeric, errors='coerce')
+
+        return data
