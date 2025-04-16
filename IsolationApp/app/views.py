@@ -1,7 +1,8 @@
 from django.shortcuts import render
 import pandas as pd
 from anomaly_detection.predict import CombinedModel
-from anomaly_detection.config import ALTERNATIVE_NAMES
+from anomaly_detection.config import FEATURE_INDEX_MAPPING, ALTERNATIVE_NAMES
+
 
 def index(request):
     results = []
@@ -24,30 +25,31 @@ def index(request):
             error = f'Ошибка при чтении файла: {str(e)}'
             return render(request, 'index.html', {'error': error})
 
-        # Нормализуем названия признаков
-        feature_names_list = [
-            ALTERNATIVE_NAMES.get(feature.strip(), feature.strip())
-            for feature in df.columns.tolist()
-        ]
+        # Оригинальные названия признаков
+        original_feature_names_list = [feature.strip() for feature in df.columns.tolist()]
 
-        combined_model = CombinedModel(feature_names_list)
+        print("Переданные признаки из файла:")
+        print(original_feature_names_list)
+
+        # Инициализация CombinedModel с добавлением FEATURE_INDEX_MAPPING и ALTERNATIVE_NAMES
+        combined_model = CombinedModel(original_feature_names_list, FEATURE_INDEX_MAPPING, ALTERNATIVE_NAMES)
         predictions = combined_model.predict(df)
 
-        # Здесь predictions — это список списков с результатами для каждой строки
-        for idx, (final_prediction, row_results) in enumerate(predictions):  # Изменение здесь
+        # Обработка результатов предсказаний
+        for idx, (final_prediction, row_results) in enumerate(predictions):
             formatted_row = {
                 'values': []
             }
             missing_features = []
 
-            for feature, status in zip(combined_model.feature_names_list, row_results):
-                value = df.iloc[idx].get(feature, "Недоступно (нет модели)")
-                if status == "Недоступно (нет модели)":
-                    missing_features.append(feature)
+            for original_feature, status in zip(combined_model.original_feature_names_list, row_results):
+                value = df.iloc[idx].get(original_feature, "Недоступно (нет модели)")
+                if status == "Недоступно (нет модели)" or status == "Недоступно (нет данных)":
+                    missing_features.append(original_feature)
                     continue
                 else:
                     formatted_row['values'].append({
-                        'feature': feature,
+                        'feature': original_feature,  # Используем оригинальное название
                         'value': value,
                         'status': status
                     })
