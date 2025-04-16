@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import pandas as pd
 from anomaly_detection.predict import CombinedModel
+from anomaly_detection.config import ALTERNATIVE_NAMES
 
 def index(request):
     results = []
@@ -23,19 +24,24 @@ def index(request):
             error = f'Ошибка при чтении файла: {str(e)}'
             return render(request, 'index.html', {'error': error})
 
-        feature_names_list = df.columns.tolist()
+        # Нормализуем названия признаков
+        feature_names_list = [
+            ALTERNATIVE_NAMES.get(feature.strip(), feature.strip())
+            for feature in df.columns.tolist()
+        ]
+
         combined_model = CombinedModel(feature_names_list)
         predictions = combined_model.predict(df)
 
-        for idx, (final_prediction, row_results) in enumerate(predictions):
+        # Здесь predictions — это список списков с результатами для каждой строки
+        for idx, (final_prediction, row_results) in enumerate(predictions):  # Изменение здесь
             formatted_row = {
                 'values': []
             }
             missing_features = []
 
-            for feature, status in zip(feature_names_list, row_results):
+            for feature, status in zip(combined_model.feature_names_list, row_results):
                 value = df.iloc[idx].get(feature, "Недоступно (нет модели)")
-
                 if status == "Недоступно (нет модели)":
                     missing_features.append(feature)
                     continue
@@ -45,6 +51,10 @@ def index(request):
                         'value': value,
                         'status': status
                     })
+
+            # Если хотя бы два признака аномальны, считаем всю строку аномальной
+            anomaly_count = sum(1 for r in row_results if r == "Аномалия")
+            final_prediction = "Аномалия" if anomaly_count >= 2 else "Нормальная точка"
 
             if final_prediction == "Аномалия":
                 results.append(formatted_row)

@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import RobustScaler
 import joblib
-from anomaly_detection.config import BASE_DIR, MODELS_DIR, DATASET_FILES, ISOLATION_FOREST_PARAMS
+from anomaly_detection.config import DATA_DIR, MODELS_DIR, DATASET_FILES, ISOLATION_FOREST_PARAMS
 
 def load_and_prepare_data(file_path):
     """
@@ -31,10 +31,10 @@ def train_and_save_models():
     """
     os.makedirs(MODELS_DIR, exist_ok=True)
 
-    feature_names_list = get_feature_names_list(BASE_DIR, DATASET_FILES)
+    feature_names_list = get_feature_names_list(DATA_DIR, DATASET_FILES)
 
     for i, file in enumerate(DATASET_FILES):
-        file_path = os.path.join(BASE_DIR, file)
+        file_path = os.path.join(DATA_DIR, file)
         df = load_and_prepare_data(file_path)
 
         for feature in df.columns:

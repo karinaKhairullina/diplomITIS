@@ -3,8 +3,8 @@ import numpy as np
 import os
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-data_dir = os.path.join(base_dir, '..', 'raw')
-output_dir = os.path.join(base_dir, '..', 'processed')
+data_dir = os.path.join(base_dir, '..', 'data', 'raw')
+output_dir = os.path.join(base_dir, '..', 'data', 'processed')
 
 required_files = ['Everquest_data.csv']
 
@@ -35,12 +35,18 @@ for file_name in required_files:
         # Удаление строк, где есть хотя бы один 0
         df = df[(df != 0).all(axis=1)]
 
+        # Преобразование уровней в числовой формат
         df['victim_level'] = pd.to_numeric(df['victim_level'], errors='coerce')
         df['attacker_level'] = pd.to_numeric(df['attacker_level'], errors='coerce')
 
+        # Удаление строк с пропущенными значениями в уровнях
         df = df.dropna(subset=['victim_level', 'attacker_level'])
 
-        selected_columns = ['victim_level', 'attacker_level']
+        # Создаем новый столбец для разницы уровней
+        df['level_difference'] = df['attacker_level'] - df['victim_level']
+
+        # Выбираем только столбец с разницей уровней
+        selected_columns = ['level_difference']
         final_df.append(df[selected_columns])
 
 # Объединение всех данных
@@ -52,19 +58,21 @@ if final_df:
     new_data = []
 
     for _ in range(num_new_rows):
-        new_victim_level = final_df['victim_level'].sample(1).values[0] + np.random.randint(-5, 6)
-        new_attacker_level = final_df['attacker_level'].sample(1).values[0] + np.random.randint(-5, 6)
+        new_victim_level = final_df['level_difference'].sample(1).values[0] + np.random.randint(-5, 6)
+        new_attacker_level = final_df['level_difference'].sample(1).values[0] + np.random.randint(-5, 6)
 
         # Добавление небольшого количества аномальных данных
         if np.random.rand() < 0.01:  # Аномалия с вероятностью 1%
             new_victim_level = np.random.randint(1, 100)  # Аномально низкий уровень
             new_attacker_level = np.random.randint(100, 200)  # Аномально высокий уровень
 
-        new_data.append([new_victim_level, new_attacker_level])
+        # Вычисляем разницу уровней для синтетических данных
+        new_level_difference = new_attacker_level - new_victim_level
+        new_data.append([new_level_difference])
 
-    new_df = pd.DataFrame(new_data, columns=['victim_level', 'attacker_level'])
+    new_df = pd.DataFrame(new_data, columns=['level_difference'])
 
     expanded_df = pd.concat([final_df, new_df], ignore_index=True)
 
-    output_file = os.path.join(output_dir, 'end_data3.csv')
+    output_file = os.path.join(output_dir, 'end_data5.csv')
     expanded_df.to_csv(output_file, index=False)

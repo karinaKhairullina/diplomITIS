@@ -2,8 +2,8 @@ import pandas as pd
 import os
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-data_dir = os.path.join(base_dir, '..', 'raw')
-output_dir = os.path.join(base_dir, '..', 'processed')
+data_dir = os.path.join(base_dir, '..', 'data', 'raw')
+output_dir = os.path.join(base_dir, '..', 'data', 'processed')
 
 required_files = ['playersData_Warhammer.csv', 'playersDataWOW1.csv', 'playersDataWOW2.csv']
 
@@ -33,5 +33,5 @@ for file_name in required_files:
 
 if final_df:
     final_df = pd.concat(final_df, ignore_index=True)
-    output_file = os.path.join(output_dir, 'end_data1.csv')
+    output_file = os.path.join(output_dir, 'end_data4.csv')
     final_df.to_csv(output_file, index=False)
