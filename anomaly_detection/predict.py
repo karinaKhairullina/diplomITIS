@@ -98,14 +98,24 @@ class CombinedModel:
     def aggregate_columns(self, data):
         """Объединяем все значения альтернативных признаков в один столбец на каждый нормализованный признак."""
 
+        # Удаляем столбцы с ненужными именами, такими как "Unnamed: 0" или "Unnamed: 1"
+        data = data.loc[:, ~data.columns.str.contains('^Unnamed')]
+
         # Переименовываем столбцы согласно ALTERNATIVE_NAMES
         data_renamed = data.rename(columns=ALTERNATIVE_NAMES)
 
+        # Логируем все переименованные столбцы
+        print("Переименованные столбцы:", data_renamed.columns.tolist())
+
         aggregated = {}
 
+        # Обрабатываем каждый столбец для агрегации
         for col in set(data_renamed.columns):
             # Собираем все столбцы с одинаковым нормализованным именем
             cols_with_same_name = [c for c in data_renamed.columns if c == col]
+
+            # Логируем, какие столбцы объединяются
+            print(f"Объединяем столбцы для признака {col}: {cols_with_same_name}")
 
             # Объединяем значения из этих столбцов в один Series
             combined_values = pd.concat(
@@ -122,6 +132,7 @@ class CombinedModel:
         result_df = pd.DataFrame(aggregated)
 
         return result_df
+
 
     def clean_data(self, data):
         """Очистка данных: замена запятых на точки, приведение к числам, NaN вместо ошибок."""

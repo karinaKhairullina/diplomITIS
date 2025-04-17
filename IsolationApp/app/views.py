@@ -1,3 +1,4 @@
+
 from django.shortcuts import render
 import pandas as pd
 from anomaly_detection.predict import CombinedModel
@@ -99,3 +100,6 @@ def index(request):
         'missing_features_list': sorted(missing_features_set),
         'error': error
     })
+
+
+
