@@ -34,4 +34,4 @@ for file_name, final_column_name in group_files.items():
         result_df.to_csv(output_path, index=False)
         print(f"{file_name} → сохранён как один столбец '{final_column_name}' ({len(result_df)} строк)")
     else:
-        print(f"⚠️ Файл не найден: {file_name}")
+        print(f"Файл не найден: {file_name}")

@@ -29,36 +29,39 @@
     </form>
 
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
+    <p style="color: red;">{{ error }}</p>
 
-    {% if results %}
-        <div class="results"> <!-- добавлен класс "results" -->
+    {% elif results %}
+        <div class="results">
             <h2>Результаты анализа</h2>
             {% for row in results %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Признак</th>
-                            <th>Значение</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in row.values %}
+                <div class="row-block">
+                    <h3>Строка №{{ row.row_number }}</h3>
+                    <table>
+                        <thead>
                             <tr>
-                                <td>{{ item.feature }}</td>
-                                <td class="{% if item.status == 'Нормальная точка' %}normal{% elif item.status == 'Аномалия' %}anomaly{% endif %}">
-                                    {{ item.value }}
-                                </td>
+                                <th>ПРИЗНАК</th>
+                                <th>ЗНАЧЕНИЕ</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for item in row.values %}
+                                <tr>
+                                    <td>{{ item.feature }}</td>
+                                    <td class="{% if item.status == 'Аномалия' %}anomaly{% elif item.status == 'missing' %}missing{% else %}normal{% endif %}">
+                                        {{ item.value }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% endfor %}
         </div>
-    {% elif request.method == 'POST' %}
+    {% elif request.method == 'POST' and not error %}
         <p>Аномалий не обнаружено.</p>
     {% endif %}
+
 
     {% if missing_features_list %}
         <h3>Признаки без данных:</h3>
@@ -72,8 +75,9 @@
     <div class="info">
         <strong>Пояснения по цветам:</strong>
         <ul>
-            <li><span style="color: green;">Зеленый</span> - нормальное значение</li>
-            <li><span style="color: red;">Красный</span> - аномальная точка</li>
+            <li><span style="color: green;">Зелёный</span> — нормальное значение</li>
+            <li><span style="color: red;">Красный</span> — аномальная точка</li>
+            <li><span style="color: orange;">Жёлтый</span> — нет данных для анализа</li>
         </ul>
     </div>
 
@@ -82,33 +86,25 @@
     <div id="modal" class="modal">
         <span class="close" onclick="closeModal()">&times;</span>
         <h3>О проекте</h3>
-        <p>Сайт преднзначен для загрузки игровых логов и выявления аномального поведения игроков в них. Обратите внимание! Строка будет
-            считаться аномальной только если в ней содержатся 2 аномальные точки
-            Доступные признаки для анализа(включая альтернативные названия):</p>
+        <p>Сайт предназначен для загрузки игровых логов и выявления аномального поведения игроков в них.</p>
+        <p><strong>Обратите внимание!</strong> Строка считается аномальной, если содержит <strong>2 и более аномальных точки.</strong></p>
+        <p>Доступные признаки для анализа (включая альтернативные названия):</p>
         <ul>
-            <li>Изменение рейтинга игрока-["SR Change"]</li>
-            <li>Количество убийств, совершенных игроком-["Elim", "Kills","KB", "HK"]</li>
-            <li>Количество смертей игрока-["Death", "Deaths", "D"]</li>
-            <li>Длительность раунда/матча-["Match Time"]</li>
-            <li>Нанесенный урон противнику-["Dmg", "DD", "ADR"]</li>
-            <li>Разница между уровнем жертвы и уровнем противника-["level_difference"]</li>
-            <li>Исцеления,произведенное игроком-["HD"]</li>
-            <li>Количество денежных средств, заработанных за раунд/матч-["Econ"]</li>
-            <li>Время игрока, проведенное в локации-["timeSpentLocation"]</li>
+            <li>Изменение рейтинга игрока — ["SR Change", "Rank Change", "Rating Change", "Skill Rating", "SR Delta"]</li>
+            <li>Количество убийств — ["Elim", "Kills", "KB", "HK", "Eliminations", "Kill Count", "Kills Made"]</li>
+            <li>Количество смертей — ["Death", "Deaths", "D", "Death Count", "Killed", "Fallen"]</li>
+            <li>Длительность матча — ["Match Time", "Game Time", "Duration", "Match Duration", "Time Played"]</li>
+            <li>Нанесённый урон — ["Dmg", "DD", "ADR", "Damage", "Damage Dealt", "DPS", "Damage Output"]</li>
+            <li>Разница в уровнях — ["level_difference", "Level Diff", "Level Gap", "Rank Difference", "Skill Level Difference"]</li>
+            <li>Исцеление — ["HD", "Healing", "Heal", "Health Restored", "Healing Done", "Healed"]</li>
+            <li>Заработанные деньги — ["Econ", "Economy", "Money Earned", "Earnings", "Player Economy", "Credits Earned"]</li>
+            <li>Время в локации — ["timeSpentLocation", "Time in Zone", "Location Time", "Zone Time", "Area Time"]</li>
+
         </ul>
     </div>
 
 </body>
 </html>
 
-[Сбор данных]
-       ↓
-[Предобработка данных]
-       ↓
-[Масштабирование признаков (RobustScaler)]
-       ↓
-[Обучение модели Isolation Forest]
-       ↓
-[Сохранение модели и масштабировщика]
-       ↓
-[Проверка качества модели на тестовых данных]
+
+

@@ -25,10 +25,25 @@ DATASET_FILES = [
 
 # Словарь альтернативных названий для каждого признака
 alternative_names = {
-    "Kills": ["HK", "Elim", "Kills", "KB"],
-    "Deaths": ["D", "Deaths"],
-    "Dmg": ["DD", "ADR"],
+    "SR Change": ["SR Change", "Rank Change", "Rating Change", "Skill Rating", "SR Delta"],
+    "Kills": ["Elim", "Kills", "KB", "HK", "Eliminations", "Kill Count", "Kills Made"],
+    "Deaths": ["Death", "Deaths", "D", "Death Count", "Killed", "Fallen"],
+    "Match Time": ["Match Time", "Game Time", "Duration", "Match Duration", "Time Played"],
+    "Dmg": ["Dmg", "DD", "ADR", "Damage", "Damage Dealt", "DPS", "Damage Output"],
+    "level_difference": ["level_difference", "Level Diff", "Level Gap", "Rank Difference", "Skill Level Difference"],
+    "HD": ["HD", "Healing", "Heal", "Health Restored", "Healing Done", "Healed"],
+    "Econ": ["Econ", "Economy", "Money Earned", "Earnings", "Player Economy", "Credits Earned"],
+    "timeSpentLocation": ["timeSpentLocation", "Time in Zone", "Location Time", "Zone Time", "Area Time"]
 }
+
+# Словарь для маппинга альтернативных названий к нормализованным признакам
+ALTERNATIVE_NAMES = {}
+
+# Создаём ALTERNATIVE_NAMES, где каждому альтернативному названию соответствует нормализованный признак
+for normalized, aliases in alternative_names.items():
+    for alias in aliases:
+        ALTERNATIVE_NAMES[alias] = normalized
+
 
 # Маппинг признаков на номера датасетов
 FEATURE_INDEX_MAPPING = {}
@@ -47,13 +62,7 @@ for i, dataset_file in enumerate(DATASET_FILES):
     for feature in features:
         FEATURE_INDEX_MAPPING[feature] = i
 
-# Словарь для маппинга альтернативных названий к нормализованным признакам
-ALTERNATIVE_NAMES = {}
 
-# Создаём ALTERNATIVE_NAMES, где каждому альтернативному названию соответствует нормализованный признак
-for normalized, aliases in alternative_names.items():
-    for alias in aliases:
-        ALTERNATIVE_NAMES[alias] = normalized
 
 # Параметры модели
 ISOLATION_FOREST_PARAMS = {
@@ -61,5 +70,3 @@ ISOLATION_FOREST_PARAMS = {
     'random_state': 42
 }
 
-# Проверка результата
-print("ALTERNATIVE_NAMES:", ALTERNATIVE_NAMES)
