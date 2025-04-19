@@ -29,39 +29,41 @@
     </form>
 
     {% if error %}
-    <p style="color: red;">{{ error }}</p>
+        <p style="color: red;">{{ error }}</p>
 
     {% elif results %}
         <div class="results">
             <h2>Результаты анализа</h2>
             {% for row in results %}
                 <div class="row-block">
-                    <h3>Строка №{{ row.row_number }}</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ПРИЗНАК</th>
-                                <th>ЗНАЧЕНИЕ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in row.values %}
+                    <div>
+                        <h3>Строка №{{ row.row_number }}</h3>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td>{{ item.feature }}</td>
-                                    <td class="{% if item.status == 'Аномалия' %}anomaly{% elif item.status == 'missing' %}missing{% else %}normal{% endif %}">
-                                        {{ item.value }}
-                                    </td>
+                                    <th>ПРИЗНАК</th>
+                                    <th>ЗНАЧЕНИЕ</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {% for item in row.values %}
+                                    <tr>
+                                        <td>{{ item.feature }}</td>
+                                        <td class="{% if item.status == 'Аномалия' %}anomaly{% elif item.status == 'missing' or item.value == 'Недоступно (нет данных)' %}missing{% else %}normal{% endif %}">
+                                            {{ item.value }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             {% endfor %}
         </div>
+
     {% elif request.method == 'POST' and not error %}
         <p>Аномалий не обнаружено.</p>
     {% endif %}
-
 
     {% if missing_features_list %}
         <h3>Признаки без данных:</h3>
@@ -99,12 +101,7 @@
             <li>Исцеление — ["HD", "Healing", "Heal", "Health Restored", "Healing Done", "Healed"]</li>
             <li>Заработанные деньги — ["Econ", "Economy", "Money Earned", "Earnings", "Player Economy", "Credits Earned"]</li>
             <li>Время в локации — ["timeSpentLocation", "Time in Zone", "Location Time", "Zone Time", "Area Time"]</li>
-
         </ul>
     </div>
-
 </body>
 </html>
-
-
-

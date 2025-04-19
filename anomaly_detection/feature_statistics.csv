@@ -1,0 +1,10 @@
+Kills,Deaths,Dmg,timeSpentLocation,level_difference,SR Change,Econ,HD,Match Time
+"{'mean': np.float64(17.04098989630163), 'min': np.float64(-1.4483297535487538), 'max': np.float64(41.231417024131474), 'std_dev': np.float64(8.786469931597235)}",,,,,,,,
+,"{'mean': np.float64(11.101891277100222), 'min': np.float64(0.552921537769967), 'max': np.float64(21.00102484296493), 'std_dev': np.float64(4.59378358758876)}",,,,,,,
+,,"{'mean': np.float64(3524.5698393619405), 'min': np.float64(-3794.9607668279777), 'max': np.float64(16967.0), 'std_dev': np.float64(3691.353810150047)}",,,,,,
+,,,"{'mean': np.float64(10.169360390683554), 'min': np.float64(0.0166666666666666), 'max': np.float64(74.38333333333334), 'std_dev': np.float64(14.213832342719595)}",,,,,
+,,,,"{'mean': np.float64(0.09793782828179608), 'min': np.int64(-9), 'max': np.int64(10), 'std_dev': np.float64(4.41513042856552)}",,,,
+,,,,,"{'mean': np.float64(2.2392303564307054), 'min': np.float64(-49.69896317837294), 'max': np.float64(53.944734686338485), 'std_dev': np.float64(21.733394919252643)}",,,
+,,,,,,"{'mean': np.float64(52.89849645033962), 'min': np.float64(21.0), 'max': np.float64(101.0), 'std_dev': np.float64(16.10619774742599)}",,
+,,,,,,,"{'mean': np.float64(21913.181415306695), 'min': np.int64(0), 'max': np.int64(133000), 'std_dev': np.float64(26528.44945516133)}",
+,,,,,,,,"{'mean': np.float64(12.085413075565498), 'min': np.float64(3.5745600832853266), 'max': np.float64(20.71927033335358), 'std_dev': np.float64(3.5934658720636175)}"

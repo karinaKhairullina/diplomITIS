@@ -2,140 +2,80 @@ import pandas as pd
 from anomaly_detection.config import FEATURE_INDEX_MAPPING, ALTERNATIVE_NAMES
 from anomaly_detection.cache import model_cache
 
+STATUS_NO_MODEL = "Недоступно (нет модели)"
+STATUS_ANOMALY = "Аномалия"
+STATUS_NORMAL = "Нормальная точка"
+
 
 class CombinedModel:
-    def __init__(self, original_feature_names_list, feature_index_mapping, alternative_names):
-        # Оригинальные названия признаков
+    def __init__(self, original_feature_names_list, feature_index_mapping, alternative_names, threshold=2):
         self.original_feature_names_list = [feature.strip() for feature in original_feature_names_list]
-
-        # Нормализованные названия признаков
         self.normalized_feature_names_list = [
-            alternative_names.get(feature.strip(), feature.strip())
-            for feature in original_feature_names_list
+            alternative_names.get(feature, feature)
+            for feature in self.original_feature_names_list
         ]
-
-        self.unprocessed_features = []
-
-        # Модели и масштабаторы из кэша
         self.models = model_cache.models
         self.scalers = model_cache.scalers
+        self.feature_index_mapping = feature_index_mapping
+        self.threshold = threshold
 
-        for normalized_feature in self.normalized_feature_names_list:
-            i = feature_index_mapping.get(normalized_feature)
-            if i is None or (i, normalized_feature) not in self.models:
-                self.unprocessed_features.append(normalized_feature)
-
-    def predict(self, data):
-        # Проверка на корректность входных данных
-        if not isinstance(data, pd.DataFrame):
-            raise TypeError("Ожидается таблица формата pandas.DataFrame.")
-
-        if data.empty:
-            raise ValueError("Загруженный файл пуст или не содержит данных.")
-
+    def predict(self, data: pd.DataFrame):
+        data_renamed = self.aggregate_columns(data)
         results = []
 
-        # Агрегация данных: объединяем значения всех альтернативных признаков
-        data_renamed = self.aggregate_columns(data)
+        for normalized_feature in self.normalized_feature_names_list:
+            results.append(self.get_feature_status(normalized_feature, data_renamed))
 
-        for original_feature, normalized_feature in zip(
-                self.original_feature_names_list, self.normalized_feature_names_list
-        ):
-            i = FEATURE_INDEX_MAPPING.get(normalized_feature)
-            if i is None or (i, normalized_feature) not in self.models:
-                results.append(["Недоступно (нет модели)"] * len(data_renamed))
-                continue
+        has_valid_predictions = any(
+            any(status in [STATUS_ANOMALY, STATUS_NORMAL] for status in row) for row in results
+        )
+        if not has_valid_predictions:
+            unavailable_features = [
+                feature for feature, statuses in zip(self.original_feature_names_list, results)
+                if all(status == STATUS_NO_MODEL for status in statuses)
+            ]
+            raise ValueError(
+                "Отсутствуют модели или данные для признаков: " + ", ".join(unavailable_features)
+            )
 
-            # Проверяем наличие признака в агрегированных данных
-            if normalized_feature not in data_renamed.columns:
-                results.append(["Недоступно (нет данных)"] * len(data_renamed))
-                continue
-
-            # Получаем и очищаем столбец
-            column_data = data_renamed[normalized_feature].dropna()
-            if column_data.empty:
-                results.append(["Недоступно (нет данных)"] * len(data_renamed))
-                continue
-
-            # Убедимся, что column_data является одномерным
-            if column_data.ndim > 1:
-                column_data = column_data.squeeze()
-
-            # Масштабируем значения (приводим к формату [ [x], [y], ... ])
-            scaled_data = self.scalers[(i, normalized_feature)].transform(column_data.values.reshape(-1, 1))
-
-            # Получаем предсказания модели
-            model = self.models[(i, normalized_feature)]
-            preds = model.predict(scaled_data)
-
-            # Конвертируем предсказания в текст
-            feature_results = ["Аномалия" if p == -1 else "Нормальная точка" for p in preds]
-
-            # Восстанавливаем длину столбца, заполняя NaN места, если нужно
-            full_results = []
-            pred_index = 0
-            for val in data_renamed[normalized_feature]:
-                if pd.isna(val):
-                    full_results.append("Недоступно (NaN)")
-                else:
-                    full_results.append(feature_results[pred_index])
-                    pred_index += 1
-
-            results.append(full_results)
-
-        # Транспонируем, чтобы получить предсказания по строкам
-        results = list(zip(*results))
-
-        # Финальный вывод: если 2 или более аномалий — метим всю строку как аномальную
+        results_by_row = list(zip(*results))
         final_results = []
-        for row_results in results:
-            anomaly_count = sum(1 for r in row_results if r == "Аномалия")
-            final_prediction = "Аномалия" if anomaly_count >= 2 else "Нормальная точка"
-            final_results.append((final_prediction, row_results))
+
+        for row_statuses in results_by_row:
+            anomaly_count = sum(1 for status in row_statuses if status == STATUS_ANOMALY)
+            final_prediction = STATUS_ANOMALY if anomaly_count >= self.threshold else STATUS_NORMAL
+            final_results.append((final_prediction, row_statuses))
 
         return final_results
 
-    def aggregate_columns(self, data):
-        """Объединяем все значения альтернативных признаков в один столбец на каждый нормализованный признак."""
+    def get_feature_status(self, normalized_feature, data_renamed):
+        i = self.feature_index_mapping.get(normalized_feature)
+        key = (i, normalized_feature)
 
-        # Удаляем столбцы с ненужными именами, такими как "Unnamed: 0" или "Unnamed: 1"
+        if i is None or key not in self.models or normalized_feature not in data_renamed.columns:
+            return [STATUS_NO_MODEL] * len(data_renamed)
+
+        column_data = data_renamed[normalized_feature]
+
+        if column_data.dropna().empty or not pd.to_numeric(column_data, errors='coerce').notna().all():
+            return [STATUS_NO_MODEL] * len(column_data)
+
+        scaled_data = self.scalers[key].transform(column_data.fillna(0).values.reshape(-1, 1))
+        model = self.models[key]
+        preds = model.predict(scaled_data)
+
+        return [
+            STATUS_ANOMALY if p == -1 else STATUS_NORMAL
+            for p in preds
+        ]
+
+    def aggregate_columns(self, data: pd.DataFrame) -> pd.DataFrame:
         data = data.loc[:, ~data.columns.str.contains('^Unnamed')]
-
-        # Переименовываем столбцы согласно ALTERNATIVE_NAMES
         data_renamed = data.rename(columns=ALTERNATIVE_NAMES)
 
-        # Логируем все переименованные столбцы
-        print("Переименованные столбцы:", data_renamed.columns.tolist())
+        aggregated = pd.DataFrame()
+        for col in data_renamed.columns.unique():
+            col_data = data_renamed.loc[:, data_renamed.columns == col]
+            aggregated[col] = col_data.bfill(axis=1).iloc[:, 0]
 
-        aggregated = {}
-
-        # Обрабатываем каждый столбец для агрегации
-        for col in set(data_renamed.columns):
-            # Собираем все столбцы с одинаковым нормализованным именем
-            cols_with_same_name = [c for c in data_renamed.columns if c == col]
-
-            # Логируем, какие столбцы объединяются
-            print(f"Объединяем столбцы для признака {col}: {cols_with_same_name}")
-
-            # Объединяем значения из этих столбцов в один Series
-            combined_values = pd.concat(
-                [data_renamed[c].dropna() for c in cols_with_same_name],
-                ignore_index=True
-            )
-
-            # Убедимся, что combined_values является одномерным массивом
-            if isinstance(combined_values, pd.DataFrame):
-                combined_values = combined_values.stack().reset_index(drop=True)
-
-            aggregated[col] = combined_values
-
-        result_df = pd.DataFrame(aggregated)
-
-        return result_df
-
-
-    def clean_data(self, data):
-        """Очистка данных: замена запятых на точки, приведение к числам, NaN вместо ошибок."""
-        data = data.applymap(lambda x: str(x).replace(',', '.') if isinstance(x, str) else x)
-        data = data.apply(pd.to_numeric, errors='coerce')
-        return data
+        return aggregated

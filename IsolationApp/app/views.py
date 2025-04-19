@@ -1,10 +1,8 @@
-
 from django.shortcuts import render
 import pandas as pd
-from anomaly_detection.predict import CombinedModel
+from anomaly_detection.predict import CombinedModel, STATUS_ANOMALY, STATUS_NO_MODEL
 from anomaly_detection.config import FEATURE_INDEX_MAPPING, ALTERNATIVE_NAMES
 from pandas.errors import EmptyDataError
-
 
 def index(request):
     results = []
@@ -16,90 +14,76 @@ def index(request):
         file_extension = uploaded_file.name.split('.')[-1].lower()
 
         try:
-            # Чтение файла в зависимости от расширения
             if file_extension == 'csv':
                 df = pd.read_csv(uploaded_file)
             elif file_extension == 'json':
                 df = pd.read_json(uploaded_file)
             else:
-                error = 'Неподдерживаемый формат файла'
-                return render(request, 'index.html', {'error': error})
-
+                raise ValueError("Поддерживаются только файлы формата CSV и JSON.")
         except EmptyDataError:
-            error = "Загруженный файл пустой или не содержит данных."
-            return render(request, 'index.html', {'error': error})
-
-        except Exception:
-            error = 'Ошибка при чтении файла'
-            return render(request, 'index.html', {'error': error})
+            return render(request, 'index.html', {'error': "Загруженный файл пустой или не содержит данных."})
+        except Exception as e:
+            return render(request, 'index.html', {'error': f"Ошибка при чтении файла: {str(e)}"})
 
         if df.empty:
-            error = "Загруженный файл пустой или не содержит данных."
-            return render(request, 'index.html', {'error': error})
+            return render(request, 'index.html', {'error': "Загруженный файл пустой или не содержит данных."})
 
-        # Оригинальные названия признаков
-        original_feature_names_list = [feature.strip() for feature in df.columns.tolist()]
+        original_feature_names = [f.strip() for f in df.columns.tolist()]
+        combined_model = CombinedModel(original_feature_names, FEATURE_INDEX_MAPPING, ALTERNATIVE_NAMES)
 
-        # Инициализация модели
-        combined_model = CombinedModel(original_feature_names_list, FEATURE_INDEX_MAPPING, ALTERNATIVE_NAMES)
-
-        # Очистка данных
-        df = combined_model.clean_data(df)
-        original_rows = df.copy()  # Сохраняем копию до агрегации
+        original_rows = df.copy()
 
         try:
             predictions = combined_model.predict(df)
-        except Exception:
-            error = "Ошибка при предсказании. Проверьте содержимое файла."
-            return render(request, 'index.html', {'error': error})
+        except Exception as e:
+            return render(request, 'index.html', {'error': f"Ошибка при предсказании. {str(e)}"})
 
-        # Обработка предсказаний
         for idx, (final_prediction, row_results) in enumerate(predictions):
             try:
                 row_values = original_rows.iloc[idx]
             except IndexError:
-                continue  # Пропустить, если вдруг индекс вышел за пределы
+                continue
 
             if row_values.isna().all():
                 continue
 
             formatted_row = {
                 'row_number': idx + 1,
-                'values': []
+                'values': [],
+                'final_prediction': final_prediction
             }
             missing_features = []
 
-            for original_feature, status in zip(original_feature_names_list, row_results):
-                value = row_values.get(original_feature, "Недоступно (нет модели)")
+            for original_feature, status in zip(original_feature_names, row_results):
+                raw_value = row_values.get(original_feature, None)
 
-                if status in ["Недоступно (нет модели)", "Недоступно (нет данных)", "Недоступно (NaN)"]:
+                if status == STATUS_NO_MODEL:
+                    display_value = raw_value if pd.notna(raw_value) else STATUS_NO_MODEL
                     formatted_row['values'].append({
                         'feature': original_feature,
-                        'value': value,
+                        'value': display_value,
                         'status': 'missing'
                     })
                     missing_features.append(original_feature)
                 else:
                     formatted_row['values'].append({
                         'feature': original_feature,
-                        'value': value,
+                        'value': raw_value,
                         'status': status
                     })
 
-            anomaly_count = sum(1 for r in row_results if r == "Аномалия")
-            final_prediction = "Аномалия" if anomaly_count >= 2 else "Нормальная точка"
-
-            if final_prediction == "Аномалия":
-                formatted_row['final_prediction'] = final_prediction
+            if final_prediction == STATUS_ANOMALY:
                 results.append(formatted_row)
 
             missing_features_set.update(missing_features)
+
+    elif request.method == 'POST':
+        return render(request, 'index.html', {
+            'error': "Файл не загружен. Пожалуйста, прикрепите CSV или JSON-файл для анализа."
+        })
 
     return render(request, 'index.html', {
         'results': results,
         'missing_features_list': sorted(missing_features_set),
         'error': error
     })
-
-
-

@@ -63,7 +63,6 @@ for i, dataset_file in enumerate(DATASET_FILES):
         FEATURE_INDEX_MAPPING[feature] = i
 
 
-
 # Параметры модели
 ISOLATION_FOREST_PARAMS = {
     'contamination': 0.03,
