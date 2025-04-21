@@ -53,10 +53,12 @@ def print_normal_value_range(mean, std_dev):
     """
     Рассчитывает и выводит только диапазоны нормальных значений в зависимости от стандартных отклонений.
     """
+    range_2_std = (mean - 2 * std_dev, mean + 2 * std_dev)
     range_3_std = (mean - 3 * std_dev, mean + 3 * std_dev)
 
     print(f"Диапазоны нормальных значений:")
     print(f"от {range_3_std[0]:.2f} до {range_3_std[1]:.2f}")
+    print(f"от {range_2_std[0]:.2f} до {range_2_std[1]:.2f}")
     print("-" * 40)
 
 

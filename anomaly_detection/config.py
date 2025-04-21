@@ -25,15 +25,15 @@ DATASET_FILES = [
 
 # Словарь альтернативных названий для каждого признака
 alternative_names = {
-    "SR Change": ["SR Change", "Rank Change", "Rating Change", "Skill Rating", "SR Delta"],
-    "Kills": ["Elim", "Kills", "KB", "HK", "Eliminations", "Kill Count", "Kills Made"],
-    "Deaths": ["Death", "Deaths", "D", "Death Count", "Killed", "Fallen"],
-    "Match Time": ["Match Time", "Game Time", "Duration", "Match Duration", "Time Played"],
-    "Dmg": ["Dmg", "DD", "ADR", "Damage", "Damage Dealt", "DPS", "Damage Output"],
-    "level_difference": ["level_difference", "Level Diff", "Level Gap", "Rank Difference", "Skill Level Difference"],
-    "HD": ["HD", "Healing", "Heal", "Health Restored", "Healing Done", "Healed"],
-    "Econ": ["Econ", "Economy", "Money Earned", "Earnings", "Player Economy", "Credits Earned"],
-    "timeSpentLocation": ["timeSpentLocation", "Time in Zone", "Location Time", "Zone Time", "Area Time"]
+    "SR Change": ["Change", "Rank Change", "Rating Change", "Skill Rating", "SR Delta"],
+    "Kills": ["Elim", "Kill", "KB", "HK", "Eliminations", "Kill Count", "Kills Made"],
+    "Deaths": ["Deaths", "D", "Death Count", "Killed", "Fallen"],
+    "Match Time": ["Match", "Game Time", "Duration", "Match Duration", "Time Played"],
+    "Dmg": ["DD", "ADR", "Damage", "Damage Dealt", "DPS", "Damage Output"],
+    "level_difference": ["Level Diff", "Level Gap", "Rank Difference", "Skill Level Difference"],
+    "HD": ["Healing", "Heal", "Health Restored", "Healing Done", "Healed"],
+    "Econ": ["Economy", "Money Earned", "Earnings", "Player Economy", "Credits Earned"],
+    "timeSpentLocation": ["timeLocation", "Time in Zone", "Location Time", "Zone Time", "Area Time"]
 }
 
 # Словарь для маппинга альтернативных названий к нормализованным признакам
