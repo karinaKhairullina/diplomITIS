@@ -65,7 +65,7 @@ for i, dataset_file in enumerate(DATASET_FILES):
 
 # Параметры модели
 ISOLATION_FOREST_PARAMS = {
-    'contamination': 0.03,
+    'contamination': 0.01,
     'random_state': 42
 }
 

@@ -99,8 +99,8 @@ class CombinedModel:
                 if pd.notna(val):
                     annotated_data.at[idx, col] = f"{val} ({status})"
                 else:
-                    annotated_data.at[idx, col] = status
-
+                    # Если значение NaN, то указываем статус "Недоступно (нет данных)"
+                    annotated_data.at[idx, col] = f"{STATUS_NO_DATA}"
 
         # Подсчитываем количество аномалий в каждой строке
         row_results = []

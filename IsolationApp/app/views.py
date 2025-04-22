@@ -1,6 +1,6 @@
 from django.shortcuts import render
 import pandas as pd
-from anomaly_detection.predict import CombinedModel, STATUS_ANOMALY, STATUS_NO_MODEL, STATUS_NO_DATA, STATUS_NORMAL
+from anomaly_detection.predict import CombinedModel, STATUS_ANOMALY, STATUS_NO_MODEL, STATUS_NO_DATA
 from anomaly_detection.config import FEATURE_INDEX_MAPPING, ALTERNATIVE_NAMES
 from pandas.errors import EmptyDataError
 
@@ -85,6 +85,7 @@ def index(request):
                     status_class = 'missing'
                 elif status == STATUS_NO_DATA or pd.isna(raw_value):
                     status_class = 'missing'
+                    value_part = STATUS_NO_DATA
                 else:
                     status_class = 'anomaly' if status == STATUS_ANOMALY else 'normal'
 
@@ -112,4 +113,3 @@ def index(request):
         'missing_features_list': sorted(missing_features_set),
         'error': error
     })
-
