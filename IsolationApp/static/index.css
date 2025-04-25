@@ -1,172 +1,196 @@
+/* Основные стили */
 body {
-    font-family: 'Inter', sans-serif;
+    background-color: #EDEEF8;
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+}
+
+header {
+    background: #D9D9D9;
+    border-radius: 40px;
+    height: 115px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5vh;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 h1 {
-    font-size: 36px;
-    color: #333;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    color: #000;
+    text-align: center;
 }
 
-.upload-section {
+
+.upload-section input[type="file"] {
+    display: none;
+}
+
+label[for="id_file"]::after {
+    content: 'Выбрать файл';
+    display: inline-block;
+    background-color: #9c75fa;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 34px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    cursor: pointer;
+    margin-top: 25px;
+}
+
+label[for="id_file"]::after:hover {
+    background-color: #8a5fcf;
+}
+
+.analyze-button {
+    background-color: #8D8D8D;
+    width: 200px;
+    height: 40px;
+    border-radius: 34px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+    margin-left: 160px;
+    margin-top: 10px;
 }
 
-.file-upload-text {
-    font-size: 16px;
-    color: #333;
-    margin: 0;
+.analyze-button:hover {
+    background-color: #8D8D8D;
 }
 
-.file-label {
-    cursor: pointer;
+.analyze-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
-.file-button {
-    background-color: #2765FF;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    display: inline-block;
-
-}
-
-.file-name {
-    font-style: italic;
-    color: #333;
-    font-size: 14px;
-}
-
-th {
-    background-color: #f0f0f0;
+.upload-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
     color: #000;
-    font-weight: bold;
-    text-transform: uppercase;
 }
 
-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #2765FF;
-    color: white;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-th, td {
-    border: 1px solid #373737;
-    padding: 10px;
-    text-align: left;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    border: 3px solid #2765FF;
-    width: 90%;
-    max-width: 1100px;
-    box-sizing: border-box;
-}
-
-.modal h3 {
-    margin-top: 0;
-}
-
-.close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.modal p {
+.file-name-display {
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     color: #333;
+    margin-left: 5px;
 }
 
-.info {
-    margin-top: 20px;
-}
-
-.info button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #2765FF;
-    color: white;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.buttons {
+.button-group-right {
+    position: absolute;
+    top: 180px; /* Отступ от верха страницы */
+    right: 20px; /* Позиционирование по правому краю */
     display: flex;
-    gap: 15px;
-    position: relative;
-    top: -90px;
-    justify-content: flex-end;
+    gap: 10px;
 }
 
-.normal {
-    color: green;
+.reset-button,
+.info-button {
+    width: 260px;
+    height: 40px;
+    background: #9c75fa;
+    border-radius: 34px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
 }
 
-.anomaly {
-    color: red;
+.reset-button {
+    background: #E092AB;
+    width: 200px;
 }
 
-.missing {
-    color: orange;
-}
-
-.row-block {
-    margin: 40px 0;
-    padding: 0 40px;
-}
-
-.row-block > div {
-    width: 100%;
-    max-width: 100%;
-}
-
-.row-block table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.results {
-    padding: 0 2px;
-}
-
-.table-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    box-sizing: border-box;
+.player-table {
+    margin-bottom: 20px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-    table-layout: fixed;
+    margin-bottom: 10px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+.anomaly-yes {
+    background-color: #f9d6d5;
+}
+
+.anomaly-no {
+    background-color: #d1f2ca;
+}
+
+th {
+    background-color: #c79fef;
+    color: #fff;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
 }

@@ -1,4 +1,4 @@
-﻿GameID,PlayerID,PlayerName,TeamAbbreviation,Agent,ACS,Kills,Deaths,Assists,PlusMinus,KAST_Percent,ADR,HS_Percent,FirstKills,FirstDeaths,FKFD_PlusMinus,Num_2Ks,Num_3Ks,Num_4Ks,Num_5Ks,OnevOne,OnevTwo,OnevThree,OnevFour,OnevFive,Econ,Plants,Defuses
+﻿GameID,PlayerID,PlayerName,TeamAbbreviation,Agent,ACS,Kills,Death,Assists,PlusMinus,KAST_Percent,Dmg,HS_Percent,FirstKills,FirstDeaths,FKFD_PlusMinus,Num_2Ks,Num_3Ks,Num_4Ks,Num_5Ks,OnevOne,OnevTwo,OnevThree,OnevFour,OnevFive,Econ,Plants,Defuses
 60894,8419,Reduxx,Boos,jett,313.0,24.0,10.0,3.0,14.0,0.65,195.0,0.31,4.0,4.0,0.0,2.0,2.0,2.0,0.0,1.0,0.0,0.0,0.0,0.0,74.0,0.0,0.0
 60894,466,ChurmZ,Boos,chamber,227.0,16.0,10.0,7.0,6.0,0.9,161.0,0.16,1.0,1.0,0.0,3.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,67.0,2.0,0.0
 60894,3712,diaamond,Boos,sova,226.0,17.0,9.0,8.0,8.0,0.85,148.0,0.27,3.0,0.0,3.0,1.0,2.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,58.0,3.0,0.0

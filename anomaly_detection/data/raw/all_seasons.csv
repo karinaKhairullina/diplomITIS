@@ -1,4 +1,4 @@
-season,Game #,Start SR,End SR,SR Change,Team SR avg,Enemy SR avg,Team Stack,Enemy Stack,Role 1,Role 2,Result,Streak,Leaver,Map,Mode,Match Time,Gold medals,Silver medals,Bronze medals,No medals,Elim,Elim_career,Elim_medal,Obj_kills,Obj_kills_career,Obj_kills_medal,Obj_time,Obj_time_career,Obj_time_medal,Dmg,Dmg_career,Dmg_medal,Heal,Heal_career,Heal_medal,Death,Death_career
+season,Game #,Start SR,End SR,SR Change,Team SR avg,Enemy SR avg,Team Stack,Enemy Stack,Role 1,Role 2,Result,Streak,Leaver,Map,Mode,Match Time,Gold medals,Silver medals,Bronze medals,No medals,Kills,Elim_career,Elim_medal,Obj_kills,Obj_kills_career,Obj_kills_medal,Obj_time,Obj_time_career,Obj_time_medal,Dmg,Dmg_career,Dmg_medal,Heal,Heal_career,Heal_medal,Death,Death_career
 3,1,2030,2048,,2059,2064,,,,,Win,1,No,,,,,,,,,,,,,,,,,,,,,,,,
 3,2,2048,2071,,2045,2015,,,,,Win,2,No,,,,,,,,,,,,,,,,,,,,,,,,
 3,3,2071,2098,,2054,2068,,,,,Win,3,No,,,,,,,,,,,,,,,,,,,,,,,,

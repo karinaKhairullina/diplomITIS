@@ -1,4 +1,4 @@
-Code,Faction,Class,KB,D,HK,DD,HD,CC,Honor,Win,Lose,Rol,BE
+Code,Faction,Class,Kills,Death,HK,Dmg,HD,CC,Honor,Win,Lose,Rol,BE
 SM1,Horde,Paladin,3,3,18,58874,29732,1,353,1,,dps,
 SM1,Horde,Warrior,1,4,19,33188,42355,4,356,1,,dps,
 SM1,Alliance,Druid,7,4,36,69535,4134,3,366,,1,dps,

@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 
+
 # Определяем базовую директорию проекта
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -10,18 +11,6 @@ DATA_DIR = os.path.join(BASE_DIR, 'anomaly_detection', 'data', 'processed')
 # Путь к моделям
 MODELS_DIR = os.path.join(BASE_DIR, 'anomaly_detection', 'models')
 
-# Список файлов
-DATASET_FILES = [
-    'data_group1.csv',
-    'data_group2.csv',
-    'data_group3.csv',
-    'end_data4.csv',
-    'end_data5.csv',
-    'end_data6.csv',
-    'end_data7.csv',
-    'end_data8.csv',
-    'end_data9.csv',
-]
 
 # Словарь альтернативных названий для каждого признака
 alternative_names = {
@@ -44,28 +33,24 @@ for normalized, aliases in alternative_names.items():
     for alias in aliases:
         ALTERNATIVE_NAMES[alias] = normalized
 
+REQUIRED_FEATURES = [
+    'player_id',
+    'timeSpentLocation',
+    'level_difference',
+    'SR Change',
+    'Kills',
+    'Death',
+    'Dmg',
+    'Match Time','Econ','HK','HD','timeSpentLocation_missing','level_difference_missing',
+    'SR Change_missing','Kills_missing','Death_missing','Dmg_missing','Match Time_missing','Econ_missing','HK_missing','HD_missing'
 
-# Маппинг признаков на номера датасетов
-FEATURE_INDEX_MAPPING = {}
-
-# Формируем маппинг признаков на основе номеров датасетов
-for i, dataset_file in enumerate(DATASET_FILES):
-    file_path = os.path.join(DATA_DIR, dataset_file)
-    if not os.path.exists(file_path):
-        print(f"Файл {file_path} не найден")
-        continue
-
-    df = pd.read_csv(file_path)
-    features = df.columns.tolist()
-
-    # Добавляем признаки в FEATURE_INDEX_MAPPING с номером датасета
-    for feature in features:
-        FEATURE_INDEX_MAPPING[feature] = i
+]
 
 
 # Параметры модели
 ISOLATION_FOREST_PARAMS = {
-    'contamination': 0.01,
-    'random_state': 42
+    'contamination': 0.02,
+    'random_state': 42,
+    'n_estimators': 200
 }
 

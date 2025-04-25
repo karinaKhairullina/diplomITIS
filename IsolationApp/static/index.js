@@ -1,48 +1,53 @@
-function updateFileName() {
-    const input = document.getElementById('file');
-    const fileNameSpan = document.getElementById('file-name');
-    if (input.files.length > 0) {
-        const fileName = input.files[0].name;
-        fileNameSpan.textContent = fileName;
-        localStorage.setItem('fileName', fileName);
-    } else {
-        fileNameSpan.textContent = "Файл не выбран";
-    }
-}
-
 document.addEventListener("DOMContentLoaded", function () {
-    const storedFileName = localStorage.getItem('fileName');
-    if (storedFileName) {
-        document.getElementById('file-name').textContent = storedFileName;
-    }
+    const fileInput = document.getElementById("id_file");
+    const fileNameDisplay = document.querySelector(".file-name-display");
+    const analyzeButton = document.querySelector(".analyze-button");
+    const resetButton = document.querySelector(".reset-button");
+
+    // При выборе файла
+    fileInput.addEventListener("change", function () {
+        if (fileInput.files.length > 0) {
+            fileNameDisplay.textContent = fileInput.files[0].name;
+            analyzeButton.disabled = false;
+        } else {
+            fileNameDisplay.textContent = "Файл не выбран";
+            analyzeButton.disabled = true;
+        }
+    });
+
+    // Сброс формы
+    resetButton.addEventListener("click", function () {
+    fileInput.value = "";
+    fileNameDisplay.textContent = "Файл не выбран";
+    analyzeButton.disabled = true;
+
+    // Очистить имя файла в сессии через запрос к серверу
+    fetch('/reset-file/', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            // Можете обновить UI если нужно, но в основном это просто очистит сессию
+        });
+
+    const resultsSection = document.querySelector(".results-section");
+    if (resultsSection) resultsSection.innerHTML = "";
 });
 
-function resetPage() {
-    localStorage.removeItem('fileName');
-    window.location.href = "/";
 
-    const fileNameSpan = document.getElementById('file-name');
-    fileNameSpan.textContent = "Файл не выбран";
+    // Модальное окно
+    const infoButton = document.querySelector(".info-button");
+    const modal = document.getElementById("infoModal");
+    const closeButton = document.querySelector(".close-button");
 
-    const fileInput = document.getElementById('file');
-    fileInput.value = "";
+    infoButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        modal.style.display = "flex";
+    });
 
-    const resultsSection = document.querySelector('.results');
-    if (resultsSection) {
-        resultsSection.innerHTML = '';
-    }
+    closeButton.addEventListener("click", function () {
+        modal.style.display = "none";
+    });
 
-    const missingFeaturesSection = document.getElementById('missing-features');
-    if (missingFeaturesSection) {
-        missingFeaturesSection.innerHTML = '';
-    }
-}
-
-
-function openModal() {
-    document.getElementById('modal').style.display = 'block';
-}
-
-function closeModal() {
-    document.getElementById('modal').style.display = 'none';
-}
+    window.addEventListener("click", function (e) {
+        if (e.target === modal) modal.style.display = "none";
+    });
+});

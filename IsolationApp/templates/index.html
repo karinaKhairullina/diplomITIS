@@ -2,102 +2,53 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Анализ аномалий</title>
+    <title>Детектор аномального поведения игроков</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'index.css' %}">
-    <script src="{% static 'index.js' %}" defer></script>
+    <script defer src="{% static 'index.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Анализ аномалий</h1>
+    <div class="container">
+        <header>
+            <h1>Детектор аномального поведения игроков</h1>
+        </header>
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="upload-section">
-            <p class="file-upload-text">Загрузите файл:</p>
-            <label class="file-label">
-                <input type="file" name="file" id="file" accept=".csv,.json" hidden onchange="updateFileName()">
-                <span class="file-button">Выбрать файл</span>
-            </label>
-            <span id="file-name" class="file-name">Файл не выбран</span>
-        </div>
-
-        <div class="buttons">
-            <button type="submit">Анализировать</button>
-            <button type="button" class="reset-button" onclick="resetPage()">Сбросить</button>
-        </div>
-    </form>
-
-    {% if error %}
-        <p style="color: red;">{{ error }}</p>
-    {% elif results %}
-        <div class="results">
-            <h2>Результаты анализа</h2>
-            {% for row in results %}
-                <div class="table-container">
-                    <h3>Строка №{{ row.row_number }}</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ПРИЗНАК</th>
-                                <th>ЗНАЧЕНИЕ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in row.values %}
-                                <tr>
-                                    <td>{{ item.feature }}</td>
-                                    <td class="{{ item.status }}">
-                                        {{ item.value }}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <section class="upload-section">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="button-group-left">
+                    <label for="id_file" class="upload-label">Загрузите файл:</label>
+                    <input type="file" name="file" id="id_file">
+                    <span class="file-name-display">Файл не выбран</span>
+                    <button type="submit" class="analyze-button" disabled>Анализировать</button>
                 </div>
-            {% endfor %}
+            </form>
+        </section>
+
+        <div class="button-group-right">
+            <button class="reset-button">Сбросить</button>
+            <a href="#" class="info-button">Информация о проекте</a>
         </div>
-    {% elif request.method == 'POST' and not error %}
-        <p>Аномалий не обнаружено.</p>
-    {% endif %}
 
-    {% if missing_features_list %}
-        <h3>Признаки без данных или обученной модели:</h3>
-        <p>
-            {% for feature in missing_features_list %}
-                {{ feature }}{% if not forloop.last %}, {% endif %}
-            {% endfor %} — нет данных или обученной модели для анализа
-        </p>
-    {% endif %}
-
-    <div class="info">
-        <strong>Пояснения по цветам:</strong>
-        <ul>
-            <li><span style="color: green;">Зелёный</span> — нормальное значение</li>
-            <li><span style="color: red;">Красный</span> — аномальная точка</li>
-            <li><span style="color: orange;">Оранжевый</span> — нет данных или обученной модели для анализа</li>
-        </ul>
+        <section class="results-section">
+            {% if grouped_tables %}
+                {% for player_id, table_html in grouped_tables %}
+                    <div class="player-table">
+                        <h2>Игрок {{ player_id }}:</h2>
+                        {{ table_html|safe }}
+                    </div>
+                {% endfor %}
+                <p><strong>Количество игроков с аномальным поведением:</strong> {{ n_anomalies }}</p>
+            {% endif %}
+        </section>
     </div>
 
-    <button onclick="openModal()">Информация о проекте</button>
-
-    <div id="modal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h3>О проекте</h3>
-        <p>Сайт предназначен для загрузки игровых логов и выявления аномального поведения игроков в них.</p>
-        <p><strong>Обратите внимание!</strong> Строка считается аномальной, если содержит <strong>2 и более аномальных точки.</strong></p>
-        <p>Доступные признаки для анализа (включая альтернативные названия):</p>
-        <ul>
-            <li>Изменение рейтинга игрока — ["SR Change", "Rank Change", "Rating Change", "Skill Rating", "SR Delta"]</li>
-            <li>Количество убийств — ["Elim", "Kills", "KB", "HK", "Eliminations", "Kill Count", "Kills Made"]</li>
-            <li>Количество смертей — ["Death", "Deaths", "D", "Death Count", "Killed", "Fallen"]</li>
-            <li>Длительность матча — ["Match Time", "Game Time", "Duration", "Match Duration", "Time Played"]</li>
-            <li>Нанесённый урон — ["Dmg", "DD", "ADR", "Damage", "Damage Dealt", "DPS", "Damage Output"]</li>
-            <li>Разница в уровнях — ["level_difference", "Level Diff", "Level Gap", "Rank Difference", "Skill Level Difference"]</li>
-            <li>Исцеление — ["HD", "Healing", "Heal", "Health Restored", "Healing Done", "Healed"]</li>
-            <li>Заработанные деньги — ["Econ", "Economy", "Money Earned", "Earnings", "Player Economy", "Credits Earned"]</li>
-            <li>Время в локации — ["timeSpentLocation", "Time in Zone", "Location Time", "Zone Time", "Area Time"]</li>
-        </ul>
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p>Всем привет! Это мой проект</p>
+        </div>
     </div>
 </body>
 </html>

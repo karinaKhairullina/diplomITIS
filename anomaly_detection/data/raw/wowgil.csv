@@ -1,4 +1,4 @@
-Code,Faction,Class,KB,D,HK,DD,HD,BA,BD,Honor,Win,Lose,Rol,BE
+Code,Faction,Class,Kills,Death,HK,Dmg,HD,BA,BD,Honor,Win,Lose,Rol,BE
 BG1,Alliance,Monk,0,2,17,1404,111000,,,213,,1,heal,
 BG1,Horde,Shaman,2,4,17,23373,5920,,,358,1,,dps,
 BG1,Alliance,Paladin,3,4,17,72205,35392,,,211,,1,dps,

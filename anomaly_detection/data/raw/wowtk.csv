@@ -1,4 +1,4 @@
-Code,Faction,Class,KB,D,HK,DD,HD,OP,VP,Honor,Win,Lose,Rol,BE
+Code,Faction,Class,Kills,Death,HK,Dmg,HD,OP,VP,Honor,Win,Lose,Rol,BE
 TK1,Alliance,Death Knight,6,3,58,25925,11314,4,444,554,1,,dps,
 TK1,Alliance,Mage,6,2,57,28438,5258,1,120,251,1,,dps,
 TK1,Alliance,Druid,8,3,55,45584,7932,,80,547,1,,dps,

@@ -1,4 +1,4 @@
-Code,Faction,Class,KB,D,HK,DD,HD,FC,FR,Honor,Win,Lose,Rol,BE
+Code,Faction,Class,Kills,Death,HK,Dmg,HD,FC,FR,Honor,Win,Lose,Rol,BE
 WG1,Horde,Hunter,1,3,14,48155,6641,1,,532,1,,dps,
 WG1,Horde,Death Knight,1,3,12,27025,7106,,,377,1,,dps,
 WG1,Alliance,Paladin,0,1,19,824,93879,,,252,,1,heal,
