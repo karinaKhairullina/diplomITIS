@@ -4,51 +4,49 @@
     <meta charset="UTF-8">
     <title>Детектор аномального поведения игроков</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'index.css' %}">
-    <script defer src="{% static 'index.js' %}"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@800&display=swap" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="stylesheet" href="{% static 'index.css' %}?v=2">
+    <script defer src="{% static 'index.js' %}?v=4"></script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Детектор аномального поведения игроков</h1>
-        </header>
+<div class="container">
+    <header>
+        <h1>Детектор аномального поведения игроков</h1>
+    </header>
 
-        <section class="upload-section">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="button-group-left">
-                    <label for="id_file" class="upload-label">Загрузите файл:</label>
-                    <input type="file" name="file" id="id_file">
-                    <span class="file-name-display">Файл не выбран</span>
-                    <button type="submit" class="analyze-button" disabled>Анализировать</button>
-                </div>
-            </form>
-        </section>
+    <section class="upload-section">
+        <form id="uploadForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="button-group-left">
+                <label for="id_file" class="upload-label">Загрузите файл:</label>
+                <input type="file" name="file" id="id_file">
+                <span class="file-name-display">Файл не выбран</span>
+                <button type="submit" class="analyze-button" disabled>Анализировать</button>
+            </div>
+        </form>
+    </section>
 
-        <div class="button-group-right">
-            <button class="reset-button">Сбросить</button>
-            <a href="#" class="info-button">Информация о проекте</a>
+    <div class="button-group-right">
+        <button class="reset-button">Сбросить</button>
+        <button type="button" class="info-button">Информация о проекте</button>
+
+        <div class="toggle-anomalies">
+            <label class="switch">
+                <input type="checkbox" id="anomalyToggle">
+                <span class="slider round"></span>
+            </label>
+            <span class="toggle-label">Показать все строки</span>
         </div>
-
-        <section class="results-section">
-            {% if grouped_tables %}
-                {% for player_id, table_html in grouped_tables %}
-                    <div class="player-table">
-                        <h2>Игрок {{ player_id }}:</h2>
-                        {{ table_html|safe }}
-                    </div>
-                {% endfor %}
-                <p><strong>Количество игроков с аномальным поведением:</strong> {{ n_anomalies }}</p>
-            {% endif %}
-        </section>
     </div>
+
+    <section class="results-section"></section>
 
     <div id="infoModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
-            <p>Всем привет! Это мой проект</p>
+            <p>Детекция аномального поведения игроков.</p>
         </div>
     </div>
+</div>
 </body>
 </html>

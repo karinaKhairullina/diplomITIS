@@ -13,25 +13,20 @@ MODELS_DIR = os.path.join(BASE_DIR, 'anomaly_detection', 'models')
 
 
 # Словарь альтернативных названий для каждого признака
-alternative_names = {
-    "SR Change": ["Change", "Rank Change", "Rating Change", "Skill Rating", "SR Delta"],
-    "Kills": ["Elim", "Kill", "KB", "HK", "Eliminations", "Kill Count", "Kills Made"],
-    "Deaths": ["Deaths", "D", "Death Count", "Killed", "Fallen"],
-    "Match Time": ["Match", "Game Time", "Duration", "Match Duration", "Time Played"],
-    "Dmg": ["DD", "ADR", "Damage", "Damage Dealt", "DPS", "Damage Output"],
-    "level_difference": ["Level Diff", "Level Gap", "Rank Difference", "Skill Level Difference"],
-    "HD": ["Healing", "Heal", "Health Restored", "Healing Done", "Healed"],
-    "Econ": ["Economy", "Money Earned", "Earnings", "Player Economy", "Credits Earned"],
-    "timeSpentLocation": ["timeLocation", "Time in Zone", "Location Time", "Zone Time", "Area Time"]
+FEATURE_ALIASES = {
+    'Kills': ['kills', 'frags', 'killed_enemies'],
+    'Death': ['death', 'deaths', 'fallen'],
+    'Dmg': ['damage', 'dmg', 'total_damage'],
+    'HK': ['honorable_kills', 'hk', 'honor_kills'],
+    'HD': ['healing_done', 'heals', 'total_heal'],
+    'SR Change': ['sr_change', 'sr_diff', 'sr_delta'],
+    'Match Time': ['match_time', 'duration', 'game_time'],
+    'Econ': ['economy', 'econ_score', 'money'],
+    'timeSpentLocation': ['time_spent', 'location_time', 'time_in_zone'],
+    'level_difference': ['level_diff', 'lvl_gap', 'difference_level'],
+    'player_id': ['player_id', 'id', 'player']
 }
 
-# Словарь для маппинга альтернативных названий к нормализованным признакам
-ALTERNATIVE_NAMES = {}
-
-# Создаём ALTERNATIVE_NAMES, где каждому альтернативному названию соответствует нормализованный признак
-for normalized, aliases in alternative_names.items():
-    for alias in aliases:
-        ALTERNATIVE_NAMES[alias] = normalized
 
 REQUIRED_FEATURES = [
     'player_id',
@@ -41,16 +36,27 @@ REQUIRED_FEATURES = [
     'Kills',
     'Death',
     'Dmg',
-    'Match Time','Econ','HK','HD','timeSpentLocation_missing','level_difference_missing',
-    'SR Change_missing','Kills_missing','Death_missing','Dmg_missing','Match Time_missing','Econ_missing','HK_missing','HD_missing'
-
+    'Match Time',
+    'Econ',
+    'HK',
+    'HD',
+    'timeSpentLocation_missing',
+    'level_difference_missing',
+    'SR Change_missing',
+    'Kills_missing',
+    'Death_missing',
+    'Dmg_missing',
+    'Match Time_missing',
+    'Econ_missing',
+    'HK_missing',
+    'HD_missing'
 ]
 
 
 # Параметры модели
 ISOLATION_FOREST_PARAMS = {
-    'contamination': 0.02,
+    'contamination': 0.01,
     'random_state': 42,
-    'n_estimators': 200
+    'n_estimators': 100
 }
 

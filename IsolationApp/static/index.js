@@ -3,51 +3,108 @@ document.addEventListener("DOMContentLoaded", function () {
     const fileNameDisplay = document.querySelector(".file-name-display");
     const analyzeButton = document.querySelector(".analyze-button");
     const resetButton = document.querySelector(".reset-button");
+    const resultsSection = document.querySelector(".results-section");
+    const anomalyToggle = document.getElementById("anomalyToggle");
 
-    // При выборе файла
+    // Статус
+    const statusMessage = document.createElement("p");
+    statusMessage.className = "status-message";
+    analyzeButton.parentNode.appendChild(statusMessage);
+
+    let anomaliesHTML = {};
+    let allRowsHTML = {};
+    let anomalyCount = 0;
+
     fileInput.addEventListener("change", function () {
-        if (fileInput.files.length > 0) {
-            fileNameDisplay.textContent = fileInput.files[0].name;
-            analyzeButton.disabled = false;
+        fileNameDisplay.textContent = fileInput.files.length > 0
+            ? fileInput.files[0].name
+            : "Файл не выбран";
+        analyzeButton.disabled = fileInput.files.length === 0;
+        setStatus("");
+    });
+
+    analyzeButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        setStatus("Статус: Обработка файла...");
+
+        fetch("/", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": getCSRFToken()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                setStatus("Статус: Ошибка: " + data.error);
+            } else {
+                anomaliesHTML = data.anomalies;
+                allRowsHTML = data.all_rows;
+                anomalyCount = data.n_anomalies;
+                displayResults(anomaliesHTML, "Аномальные данные", anomalyCount);
+                setStatus("Статус: Файл успешно обработан");
+            }
+        })
+        .catch(() => {
+            setStatus("Статус: Ошибка отправки файла.");
+        });
+    });
+
+    anomalyToggle.addEventListener("change", function () {
+        const isChecked = anomalyToggle.checked;
+        if (Object.keys(anomaliesHTML).length === 0) return;
+        if (isChecked) {
+            displayResults(allRowsHTML, "Все строки");
         } else {
-            fileNameDisplay.textContent = "Файл не выбран";
-            analyzeButton.disabled = true;
+            displayResults(anomaliesHTML, "Аномальные данные", anomalyCount);
         }
     });
 
-    // Сброс формы
     resetButton.addEventListener("click", function () {
-    fileInput.value = "";
-    fileNameDisplay.textContent = "Файл не выбран";
-    analyzeButton.disabled = true;
+        fileInput.value = "";
+        fileNameDisplay.textContent = "Файл не выбран";
+        analyzeButton.disabled = true;
 
-    // Очистить имя файла в сессии через запрос к серверу
-    fetch('/reset-file/', { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            // Можете обновить UI если нужно, но в основном это просто очистит сессию
+        fetch("/reset-file/", {
+            method: "POST",
+            headers: { "X-CSRFToken": getCSRFToken() }
         });
 
-    const resultsSection = document.querySelector(".results-section");
-    if (resultsSection) resultsSection.innerHTML = "";
-});
-
-
-    // Модальное окно
-    const infoButton = document.querySelector(".info-button");
-    const modal = document.getElementById("infoModal");
-    const closeButton = document.querySelector(".close-button");
-
-    infoButton.addEventListener("click", function (e) {
-        e.preventDefault();
-        modal.style.display = "flex";
+        resultsSection.innerHTML = "";
+        setStatus("");
     });
 
-    closeButton.addEventListener("click", function () {
-        modal.style.display = "none";
-    });
+    function displayResults(groupedTables, title, count = null) {
+        resultsSection.innerHTML = `<h2>${title}:</h2>`;
 
-    window.addEventListener("click", function (e) {
-        if (e.target === modal) modal.style.display = "none";
-    });
+        for (const player in groupedTables) {
+            const tableHTML = groupedTables[player];
+            const playerSection = document.createElement("div");
+            playerSection.classList.add("player-section");
+            playerSection.innerHTML = `
+                <h3>Игрок: ${player}</h3>
+                <div class="table-wrapper">${tableHTML}</div>
+            `;
+            resultsSection.appendChild(playerSection);
+        }
+
+        if (count !== null) {
+            const summary = document.createElement("p");
+            summary.innerHTML = `<strong>Количество аномальных строк:</strong> ${count}`;
+            resultsSection.appendChild(summary);
+        }
+    }
+
+    function setStatus(message) {
+        statusMessage.textContent = message;
+    }
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
 });

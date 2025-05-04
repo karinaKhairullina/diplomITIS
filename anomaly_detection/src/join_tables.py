@@ -86,18 +86,32 @@ aggregated_df = all_scenarios_df.groupby('player_id')[numeric_columns].agg('medi
 aggregated_df.columns = [f'{col}' for col in aggregated_df.columns]
 aggregated_df.reset_index(inplace=True)
 
-# Обработка пропусков
-for col in aggregated_df.columns:
-    if col != 'player_id':
-        aggregated_df[f'{col}_missing'] = aggregated_df[col].isna().astype(int)
-        aggregated_df[col] = aggregated_df[col].fillna(0)
+# Функция для обработки обучающих данных
+def prepare_train_data(df):
+    """
+    Обрабатывает данные для обучения: заменяет NaN на 0 и добавляет флаги отсутствующих данных.
+    """
+    df_processed = df.copy()
+    for col in df_processed.columns:
+        if col != 'player_id':
+            df_processed[f'{col}_missing'] = df_processed[col].isna().astype(int)
+            df_processed[col] = df_processed[col].fillna(0)
+    return df_processed
 
-# Разделение: 80% train, 20% test
+# Функция для обработки тестовых данных
+def prepare_test_data(df):
+    """
+    Обрабатывает данные для теста: оставляет NaN как есть.
+    """
+    return df.copy()
+
+# Разделение на обучающую и тестовую выборку (80% train, 20% test)
 train_df, test_df = train_test_split(aggregated_df, test_size=0.2, random_state=42)
+
+# Подготовка обучающих и тестовых данных
+train_df = prepare_train_data(train_df)
+test_df = prepare_test_data(test_df)
 
 # Сохраняем обе выборки
 train_df.to_csv(os.path.join(processed_dir, 'train_data.csv'), index=False)
 test_df.to_csv(os.path.join(processed_dir, 'test_data.csv'), index=False)
-
-
-
