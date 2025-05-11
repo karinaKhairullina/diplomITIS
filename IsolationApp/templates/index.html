@@ -44,7 +44,24 @@
     <div id="infoModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
-            <p>Детекция аномального поведения игроков.</p>
+            <p>
+                Система для автоматического выявления нетипичного поведения игроков в многопользовательских онлайн-играх (MMORPG) с помощью алгоритма Isolation Forest.
+            </p>
+            <h3>Альтернативные наименования признаков</h3>
+            <ul>
+                <li><strong>Kills(кол-во убийств)</strong>: kills, frags, killed_enemies</li>
+                <li><strong>Death(кол-во смертей)</strong>: death, deaths, fallen</li>
+                <li><strong>Dmg(урон)</strong>: damage, dmg, total_damage</li>
+                <li><strong>HK(кол-во убийств в группе)(</strong>: honorable_kills, hk, honor_kills</li>
+                <li><strong>HD(исцеления)</strong>: healing_done, heals, total_heal</li>
+                <li><strong>SR Change(изменение рейтинга игрока)</strong>: sr_change, sr_diff, sr_delta</li>
+                <li><strong>Match Time(длительность сражения)</strong>: match_time, duration, game_time</li>
+                <li><strong>Econ(кол-во денежных средств)</strong>: economy, econ_score, money</li>
+                <li><strong>timeSpentLocation(время в локации)</strong>: time_spent, location_time, time_in_zone</li>
+                <li><strong>level_difference(разница уровней атакующего/жертвы)</strong>: level_diff, lvl_gap, difference_level</li>
+                <li><strong>player_id</strong>: player_id, id, player</li>
+            </ul>
+            <p><em>Если ваш файл содержит другие имена признаков, они могут быть автоматически не распознаны. В этом случае отредактируйте названия вручную.</em></p>
         </div>
     </div>
 </div>

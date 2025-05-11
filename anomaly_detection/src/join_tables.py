@@ -23,7 +23,7 @@ def compute_time_spent(df, start_col, stop_col):
     return (df[stop_col] - df[start_col]).dt.total_seconds() / 60
 
 
-# --- 1. WoW timeSpentLocation ---
+# 1. WoW timeSpentLocation
 dfs = []
 for filename in ['playersDataWOW1.csv', 'playersDataWOW2.csv']:
     filepath = os.path.join(data_dir, filename)
@@ -34,7 +34,7 @@ for filename in ['playersDataWOW1.csv', 'playersDataWOW2.csv']:
 time_df = pd.concat(dfs, ignore_index=True)
 time_df['player_id'] = range(1, len(time_df) + 1)
 
-# --- 2. Everquest ---
+# 2. Everquest
 df = pd.read_csv(os.path.join(data_dir, 'Everquest_data.csv'), quotechar='"')
 df_split = df.iloc[:, 0].astype(str).str.split(',', expand=True)
 df_split.columns = ['id', 'victim_id', 'victim_guild_id', 'victim_level', 'attacker_id',
@@ -46,7 +46,7 @@ df_split['level_difference'] = df_split['attacker_level'] - df_split['victim_lev
 df_split = df_split[['level_difference']]
 df_split['player_id'] = range(1, len(df_split) + 1)
 
-# --- 3. Overwatch ---
+# 3. Overwatch
 def parse_match_time(t):
     try:
         mins, secs = map(int, str(t).split(':'))
@@ -59,12 +59,12 @@ season_df['Match Time'] = season_df['Match Time'].apply(parse_match_time)
 season_df = season_df[['SR Change', 'Kills', 'Death', 'Dmg', 'Match Time']]
 season_df['player_id'] = range(1, len(season_df) + 1)
 
-# --- 4. Valorant ---
+# 4. Valorant
 valorant_df = pd.read_csv(os.path.join(data_dir, 'Game_Valorant.csv'))
 valorant_df = valorant_df[['Kills', 'Death', 'Dmg', 'Econ']]
 valorant_df['player_id'] = range(1, len(valorant_df) + 1)
 
-# --- 5. WoW файлы ---
+# 5. WoW
 wow_files = ['wowbgs.csv', 'wowgil.csv', 'wowsm.csv', 'wowtk.csv', 'wowwg.csv']
 wow_dfs = []
 for filename in wow_files:
@@ -75,22 +75,17 @@ for filename in wow_files:
 wow_df = pd.concat(wow_dfs, ignore_index=True)
 wow_df['player_id'] = range(1, len(wow_df) + 1)
 
-# Объединяем всё построчно
+
 all_scenarios_df = pd.concat([time_df, df_split, season_df, valorant_df, wow_df], ignore_index=True)
 all_scenarios_df = all_scenarios_df.sort_values(by='player_id')
 
-# Группируем по player_id и агрегируем
 numeric_columns = all_scenarios_df.select_dtypes(include='number').columns.drop('player_id', errors='ignore')
 aggregated_df = all_scenarios_df.groupby('player_id')[numeric_columns].agg('median')
 
 aggregated_df.columns = [f'{col}' for col in aggregated_df.columns]
 aggregated_df.reset_index(inplace=True)
 
-# Функция для обработки обучающих данных
 def prepare_train_data(df):
-    """
-    Обрабатывает данные для обучения: заменяет NaN на 0 и добавляет флаги отсутствующих данных.
-    """
     df_processed = df.copy()
     for col in df_processed.columns:
         if col != 'player_id':
@@ -98,20 +93,13 @@ def prepare_train_data(df):
             df_processed[col] = df_processed[col].fillna(0)
     return df_processed
 
-# Функция для обработки тестовых данных
 def prepare_test_data(df):
-    """
-    Обрабатывает данные для теста: оставляет NaN как есть.
-    """
     return df.copy()
 
-# Разделение на обучающую и тестовую выборку (80% train, 20% test)
 train_df, test_df = train_test_split(aggregated_df, test_size=0.2, random_state=42)
 
-# Подготовка обучающих и тестовых данных
 train_df = prepare_train_data(train_df)
 test_df = prepare_test_data(test_df)
 
-# Сохраняем обе выборки
 train_df.to_csv(os.path.join(processed_dir, 'train_data.csv'), index=False)
 test_df.to_csv(os.path.join(processed_dir, 'test_data.csv'), index=False)

@@ -1,14 +1,7 @@
 import os
-import pandas as pd
 
-
-# Определяем базовую директорию проекта
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Путь к директории data/processed/
 DATA_DIR = os.path.join(BASE_DIR, 'anomaly_detection', 'data', 'processed')
-
-# Путь к моделям
 MODELS_DIR = os.path.join(BASE_DIR, 'anomaly_detection', 'models')
 
 
@@ -51,7 +44,6 @@ REQUIRED_FEATURES = [
     'HK_missing',
     'HD_missing'
 ]
-
 
 # Параметры модели
 ISOLATION_FOREST_PARAMS = {

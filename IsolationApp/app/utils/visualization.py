@@ -2,16 +2,10 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
 import pandas as pd
 import umap
 
 
-def calculate_dynamic_threshold(scores, percentile=1):
-    """
-    Вычисляет динамический порог: например, 1% самых низких значений score_samples.
-    """
-    return np.percentile(scores, percentile)
 
 def plot_anomaly_score_histogram(scores, threshold=None, save_path='score_histogram.png'):
     """

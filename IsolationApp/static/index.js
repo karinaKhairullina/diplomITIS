@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const resultsSection = document.querySelector(".results-section");
     const anomalyToggle = document.getElementById("anomalyToggle");
 
-    // Статус
     const statusMessage = document.createElement("p");
     statusMessage.className = "status-message";
     analyzeButton.parentNode.appendChild(statusMessage);
@@ -29,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const formData = new FormData();
         formData.append("file", file);
 
-        setStatus("Статус: Обработка файла...");
+        setStatus("Статус. Обработка файла...");
 
         fetch("/", {
             method: "POST",
@@ -41,17 +40,17 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                setStatus("Статус: Ошибка: " + data.error);
+                setStatus("Статус.Ошибка: " + data.error);
             } else {
                 anomaliesHTML = data.anomalies;
                 allRowsHTML = data.all_rows;
                 anomalyCount = data.n_anomalies;
                 displayResults(anomaliesHTML, "Аномальные данные", anomalyCount);
-                setStatus("Статус: Файл успешно обработан");
+                setStatus("Статус.Файл успешно обработан");
             }
         })
         .catch(() => {
-            setStatus("Статус: Ошибка отправки файла.");
+            setStatus("Статус.Ошибка отправки файла.");
         });
     });
 
@@ -107,4 +106,23 @@ document.addEventListener("DOMContentLoaded", function () {
     function getCSRFToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
+
+    const infoButton = document.querySelector(".info-button");
+    const infoModal = document.getElementById("infoModal");
+    const closeButton = document.querySelector(".close-button");
+
+    infoButton.addEventListener("click", function () {
+        infoModal.style.display = "block";
+    });
+
+    closeButton.addEventListener("click", function () {
+        infoModal.style.display = "none";
+    });
+
+    // Закрыть модальное окно, если пользователь кликает вне области окна
+    window.addEventListener("click", function (e) {
+        if (e.target === infoModal) {
+            infoModal.style.display = "none";
+        }
+    });
 });
